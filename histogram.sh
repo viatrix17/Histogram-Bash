@@ -1,18 +1,30 @@
 #!/bin/bash
 
-declare -A words=()
+declare -A words=([.]=0)
 
-# check(){
-
-# }
+check(){
+    local yes=0
+    for potential_word in ${!words[@]}
+    do
+        if [[ $potential_word == $word ]]
+        then
+            yes=1
+        fi
+    done
+    echo $yes
+}
 
 couting_words() {
-    echo "text: $text"
     IFS=' '  read -a current_words <<< "$text"
     for word in ${current_words[@]}
     do
-        
-        echo $word
+        output=$(check $word)
+        if [[ $output == 1 ]]
+        then
+            words[$word]=$((words[$word]+1))
+        else
+            words[$word]=1
+        fi
     done
 }
 
@@ -22,10 +34,10 @@ then
     echo "help" #do dodania
     shift   #shifting the arguments by one to right
 fi
+
 #counting the words
 for file in $@ #all files arguments passed to the script
 do
-    echo "file $file"
     if [[ $file == *.pdf ]] #spaces!!!!!
     then
         #convert from pdf
@@ -40,9 +52,7 @@ do
     elif [[ $file == *.txt ]]
     then
         text=$(cat $file | tr -cd "a-z " | tr -s ' ')
-        echo $text
         couting_words $text
-        echo -e "\ntxt"
     else
         echo "Wrong format."
     fi
@@ -51,5 +61,8 @@ done
 #displaying the histogram
 for i in "${!words[@]}"
 do
-    echo $i ${words[$i]}
+    if [[ $i != . ]]
+    then
+        echo $i ${words[$i]}
+    fi
 done
