@@ -14,7 +14,7 @@ check(){
     echo $yes
 }
 
-couting_words() {
+counting_words() {
     IFS=' '  read -a current_words <<< "$text"
     for word in ${current_words[@]}
     do
@@ -28,15 +28,40 @@ couting_words() {
     done
 }
 
-#help flag
-if [[ $1 == -h ]]
+flags=0
+
+#searching for flags
+for argument in $@
+do
+    echo $argument
+    if [[ $argument == -h ]]
+    then
+        help="-h\t\t\tShow this message\n-csv 'name.csv'\t\tSave the output to the CSV file.\n"
+        echo -e $help #do dodania
+        flags=$((flags+1))
+    elif [[ $argument == -c ]]
+    then
+        #zapisz do csv
+        flags=$($flags+2)
+    elif [[ $argument == -t ]]
+    then
+        #zapisz to txt
+        flags=$($flags+2)
+    fi
+done
+
+if [[ $flags == 1 ]]
 then
-    echo "help" #do dodania
-    shift   #shifting the arguments by one to right
+    shift
+elif [[ $flags > 1 ]]
+then
+    shift $((flags-1))
 fi
 
+
+
 #counting the words
-for file in $@ #all files arguments passed to the script
+for file in $@ #all files arguments passed to the script    !!!!UWAGA: jeszcze dodac czytanie po prostu z wejscia czyli jak nie ma zadnych plikow podanych!!!!!
 do
     if [[ $file == *.pdf ]] #spaces!!!!!
     then
@@ -51,12 +76,13 @@ do
         echo "ps"
     elif [[ $file == *.txt ]]
     then
-        text=$(cat $file | tr -cd "a-z " | tr -s ' ')
-        couting_words $text
+        text=$(cat $file | tr -cd "a-z " | tr -s ' ') #dodac zmienanie duzych liter na male
+        counting_words $text
     else
-        echo "Wrong format."
+        echo "Wrong format of file $file."
     fi
 done
+#UWAGA!!!! dodac zeby bledy tam przekierowywalo do kosza
 
 #displaying the histogram
 for i in "${!words[@]}"
