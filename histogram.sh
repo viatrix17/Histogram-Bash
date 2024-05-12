@@ -14,13 +14,15 @@ do
     if [[ $file == *.pdf ]] #spaces!!!!!
     then
         #convert from pdf
+        #pdf_text=$(pdftotext $file) #czy ogolnie w calym systemie czy tylko w biezacym katalogu czy musi podac sciezke po prostu??
         echo "pdf"
-    elif [ $file  == *.ps ] #convert from ps
+    elif [[ $file  == *.ps ]] #convert from ps
     then
         echo "ps"
-    elif [ $file == *.txt ]
+    elif [[ $file == *.txt ]]
     then
-        echo "txt"
+        cat $file | tr -cd "a-z " | tr -s ' '
+        echo -e "\ntxt"
     else
         echo "Wrong format."
     fi
