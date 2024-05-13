@@ -36,19 +36,20 @@ for(( i=1 ; i<=$#; i++))
 do
     if [[ ${!i} == -h ]]
     then
-        help="-h\t\t\tShow this message\n-t name.csv\t\tSave the output to the text file.\n-c name.csv\t\tSave the output to the CSV file.\n"
+        help="-h\t\t\tShow this message\n-t name.csv\t\tSave the output to the text file.\n-c name.csv\t\tSave the output to the CSV file.\nNote:\nuse command\nsudo apt install poppler-utils to install .pdf to .txt converter.\nsudo apt install pstotext to install .ps to .txt converter\n"
         echo -e $help 
         flags=$(($flags+1))
     elif [[ ${!i} == -c ]]
     then
         j=$((i+1))
         if [[ ${!j} == *.csv ]]
-        then
+        then    
             result_file=${!j}
             flags=$(($flags+1))
-            output=3
+            output=1
         else
-            output=4
+            result_file="histogram_results.csv"
+            output=1
         fi
         flags=$(($flags+1))
     elif [[ ${!i} == -t ]]
@@ -60,7 +61,8 @@ do
             flags=$(($flags+1))
             output=1
         else
-            output=2
+            result_file=histogram_results.txt
+            output=1
         fi
         flags=$(($flags+1))
     fi
@@ -82,18 +84,17 @@ do
     then
         if [[ $file == *.pdf ]] #spaces!!!!!
         then
-            #convert from pdf
-            #text=$(pdftotext $file)
-            #couting_words $text
-            echo "pdf"
-        elif [[ $file  == *.ps ]] #convert from ps
+            #convert from pdf to txt
+            text=$(pdftotext $file - | tr A-Z a-z | tr '\n' ' ' | tr -cd "a-z " | tr -s ' ') #trzeba sie dopytac o polskie znaki
+            counting_words $text
+        elif [[ $file  == *.ps ]] #convert from ps to txt
         then
-            # text=$(pstotext $file)
-            # couting_words $text
-            echo "ps"
+            text=$(pstotext $file -)
+            echo $text
+            counting_words $text
         elif [[ $file == *.txt ]]
         then
-            text=$(cat $file | tr -cd "a-z " | tr -s ' ' | tr A-Z a-z) #dodac zmienanie duzych liter na male
+            text=$(cat $file | tr A-Z a-z | tr -cd "a-z " | tr -s ' ')
             counting_words $text
         else
             echo "Wrong format of file '$file'."
@@ -104,27 +105,21 @@ do
 done
 
 #displaying the histogram
-if [[ -f $result_file ]]
+if [[ $output != 0 ]]
 then
     echo -e "Word\t\tCount" > $result_file
+    
+else
+    echo -e "Word\t\tCount"
 fi
 
 for i in "${!words[@]}"
 do
     if [[ $i != . ]]
     then
-        if [[ $output == 1 ]]   #to custom txt file
+        if [[ -f $result_file ]]
         then
             echo -e "$i\t\t${words[$i]}"  >> $result_file
-        elif [[ $output == 2 ]]  #to generated txt file
-        then
-            echo -e "$i\t\t${words[$i]}"  >> histogram_results.txt
-        elif [[ $output == 3 ]]     #to custom csv file
-        then
-            echo -e "$i\t\t${words[$i]}"  >> $result_file
-        elif [[ $output == 4 ]]     #to generated csv file
-        then
-            echo -e "$i\t${words[$i]}"  >> histogram_results.csv
         else    #to console
             echo -e "$i\t\t${words[$i]}" 
         fi
