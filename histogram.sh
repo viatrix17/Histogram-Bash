@@ -29,7 +29,7 @@ counting_words() {
 }
 
 flags=0
-output=0
+output=-1
 
 #searching for flags
 for(( i=1 ; i<=$#; i++))
@@ -39,7 +39,7 @@ do
         help="-h\t\t\tShow this message\n-t name.csv\t\tSave the output to the text file.\n-c name.csv\t\tSave the output to the CSV file.\nNote:\nuse command\nsudo apt install poppler-utils to install .pdf to .txt converter.\nsudo apt install pstotext to install .ps to .txt converter."
         echo -e $help 
         flags=$(($flags+1))
-        output=-1
+        output=2
     elif [[ ${!i} == -c ]]
     then
         j=$((i+1))
@@ -79,31 +79,38 @@ fi
 
 
 #counting the words
-for file in $@ #all files arguments passed to the script    !!!!UWAGA: jeszcze dodac czytanie po prostu z wejscia czyli jak nie ma zadnych plikow podanych!!!!!
-do
-    if [[ -f $file ]]
-    then
-        if [[ $file == *.pdf ]] #spaces!!!!!
+
+if [[ $output == -1 ]]
+then    #reading from console
+    read text
+    counting_words $text
+else
+    for file in $@ #all files arguments passed to the script    !!!!UWAGA: jeszcze dodac czytanie po prostu z wejscia czyli jak nie ma zadnych plikow podanych!!!!!
+    do
+        if [[ -f $file ]]
         then
-            #convert from pdf to txt
-            text=$(pdftotext $file - | tr A-Z a-z | tr '\n' ' ' | tr -cd "a-z " | tr -s ' ') #trzeba sie dopytac o polskie znaki
-            counting_words $text
-        elif [[ $file  == *.ps ]] #convert from ps to txt
-        then
-            text=$(pstotext $file -)
-            echo $text
-            counting_words $text
-        elif [[ $file == *.txt ]]
-        then
-            text=$(cat $file | tr A-Z a-z | tr -cd "a-z " | tr -s ' ')
-            counting_words $text
+            if [[ $file == *.pdf ]] #spaces!!!!!
+            then
+                #convert from pdf to txt
+                text=$(pdftotext $file - | tr A-Z a-z | tr '\n' ' ' | tr -cd "a-z " | tr -s ' ') #trzeba sie dopytac o polskie znaki
+                counting_words $text
+            elif [[ $file  == *.ps ]] #convert from ps to txt
+            then
+                text=$(pstotext $file -)
+                echo $text
+                counting_words $text
+            elif [[ $file == *.txt ]]
+            then
+                text=$(cat $file | tr A-Z a-z | tr -cd "a-z " | tr -s ' ')
+                counting_words $text
+            else
+                echo "Wrong format of file '$file'."
+            fi
         else
-            echo "Wrong format of file '$file'."
+            echo "File '$file' not found."
         fi
-    else
-        echo "File '$file' not found."
-    fi
-done
+    done
+fi
 
 #displaying the histogram
 if [[ $output == 1 ]]
