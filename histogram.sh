@@ -36,9 +36,10 @@ for(( i=1 ; i<=$#; i++))
 do
     if [[ ${!i} == -h ]]
     then
-        help="-h\t\t\tShow this message\n-t name.csv\t\tSave the output to the text file.\n-c name.csv\t\tSave the output to the CSV file.\nNote:\nuse command\nsudo apt install poppler-utils to install .pdf to .txt converter.\nsudo apt install pstotext to install .ps to .txt converter\n"
+        help="-h\t\t\tShow this message\n-t name.csv\t\tSave the output to the text file.\n-c name.csv\t\tSave the output to the CSV file.\nNote:\nuse command\nsudo apt install poppler-utils to install .pdf to .txt converter.\nsudo apt install pstotext to install .ps to .txt converter."
         echo -e $help 
         flags=$(($flags+1))
+        output=-1
     elif [[ ${!i} == -c ]]
     then
         j=$((i+1))
@@ -105,12 +106,13 @@ do
 done
 
 #displaying the histogram
-if [[ $output != 0 ]]
+if [[ $output == 1 ]]
 then
     echo -e "Word\t\tCount" > $result_file
     
-else
-    echo -e "Word\t\tCount"
+elif [[ $output == 0 ]]
+    then
+        echo -e "Word\t\tCount"
 fi
 
 for i in "${!words[@]}"
