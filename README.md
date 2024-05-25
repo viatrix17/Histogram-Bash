@@ -21,5 +21,5 @@ sudo apt install pstotext to install .ps to .txt converter.
 ## Help
 Use ```-h``` for help.
 ```
-histogram.sh -h
+./histogram.sh -h
 ```
