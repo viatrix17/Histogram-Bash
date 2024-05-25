@@ -12,3 +12,9 @@ wget https://raw.githubusercontent.com/viatrix17/Histogram-Bash/main/histogram.s
 ## Features
 - displaying the number of occurences of all words in given text
 - variety of input's and output's format
+
+## Help
+Use ```-h``` for help.
+```
+histogram.sh -h
+```
