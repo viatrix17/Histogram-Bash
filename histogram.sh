@@ -85,7 +85,7 @@ then    #reading from console
     read text
     counting_words $text
 else
-    for file in $@ #all files arguments passed to the script    !!!!UWAGA: jeszcze dodac czytanie po prostu z wejscia czyli jak nie ma zadnych plikow podanych!!!!!
+    for file in $@ #all files arguments passed to the script   
     do
         if [[ -f $file ]]
         then
@@ -96,7 +96,7 @@ else
                 counting_words $text
             elif [[ $file  == *.ps ]] #convert from ps to txt
             then
-                text=$(pstotext $file -)
+                text=$(pstotext $file - | tr A-Z a-z | tr '\n' ' ' | tr -cd "a-z " | tr -s ' ')
                 echo $text
                 counting_words $text
             elif [[ $file == *.txt ]]
@@ -117,7 +117,7 @@ if [[ $output == 1 ]]
 then
     echo -e "Word\t\tCount" > $result_file
     
-elif [[ $output == 0 ]]
+elif [[ $output == 0 || $output == -1 ]]
     then
         echo -e "Word\t\tCount"
 fi
