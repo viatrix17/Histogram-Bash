@@ -78,10 +78,8 @@ then
 fi
 
 
-#counting the words
-
 if [[ $output == -1 ]]
-then    #reading from console
+then  
     read text
     counting_words $text
 else
@@ -89,10 +87,10 @@ else
     do
         if [[ -f $file ]]
         then
-            if [[ $file == *.pdf ]] #spaces!!!!!
+            if [[ $file == *.pdf ]] 
             then
                 #convert from pdf to txt
-                text=$(pdftotext $file - | tr A-Z a-z | tr '\n' ' ' | tr -cd "a-z " | tr -s ' ') #trzeba sie dopytac o polskie znaki
+                text=$(pdftotext $file - | tr A-Z a-z | tr '\n' ' ' | tr -cd "a-z " | tr -s ' ') 
                 counting_words $text
             elif [[ $file  == *.ps ]] #convert from ps to txt
             then
